@@ -18,6 +18,7 @@
             --gray: #64748b;
             --light: #e2e8f0;
             --success: #10b981;
+            --danger: #ef4444;
             --card-bg: rgba(30, 41, 59, 0.7);
             --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
@@ -143,28 +144,44 @@
             letter-spacing: -0.5px;
         }
         
-        .online-badge {
+        .status-badge {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--success);
-            color: white;
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.9rem;
             font-weight: 600;
-            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             position: relative;
             z-index: 2;
+            transition: all 0.3s ease;
         }
         
-        .online-badge::before {
+        .status-badge.online {
+            background: var(--success);
+            color: white;
+        }
+        
+        .status-badge.offline {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .status-badge::before {
             content: '';
             width: 10px;
             height: 10px;
             background: white;
             border-radius: 50%;
+        }
+        
+        .status-badge.online::before {
             animation: pulse 2s infinite;
+        }
+        
+        .status-badge.offline::before {
+            background: rgba(255, 255, 255, 0.7);
         }
         
         .kick-button {
@@ -723,7 +740,9 @@
                 </div>
                 <div class="name-container">
                     <h1>Hunchos007</h1>
-                    <div class="online-badge">Online</div>
+                    <div class="status-badge online" id="statusBadge">
+                        <span class="status-text">Online</span>
+                    </div>
                     <a href="https://kick.com/hunchos007" class="kick-button" target="_blank">
                         <i class="fas fa-play-circle"></i> Kick
                     </a>
@@ -740,7 +759,6 @@
                     <a href="https://discord.gg/pEA5sUtNHQ" class="social-btn discord">
                         <i class="fab fa-discord"></i>
                     </a>
-                
                 </div>
             </div>
         </header>
@@ -750,8 +768,6 @@
             <div class="wagerrace-circle">
                 <h2><i class="fas fa-calendar-alt"></i> $1,000 Monthly leaderboard</h2>
                 <p>Compete with other players for huge prizes and VIP status.</p>
-                
-        
             </div>
         </div>
         
@@ -823,13 +839,50 @@ By using this site, you acknowledge that you are 18+ years old and accept full r
     </div>
 
     <script>
-        // Simple script to toggle online status (for demonstration)
+        // Dynamic online status based on Kick streaming status
         document.addEventListener('DOMContentLoaded', function() {
-            const onlineBadge = document.querySelector('.online-badge');
+            const statusBadge = document.getElementById('statusBadge');
+            const statusText = statusBadge.querySelector('.status-text');
             
-            // Simulate online status with a pulsing effect
+            // Function to update status based on current time (simulating streaming schedule)
+            function updateStatus() {
+                const now = new Date();
+                const day = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+                const hour = now.getHours();
+                
+                // Simulate streaming schedule: Online on weekdays from 6 PM to 11 PM
+                // and weekends from 2 PM to 1 AM
+                let isOnline = false;
+                
+                if (day >= 1 && day <= 5) { // Weekdays (Monday to Friday)
+                    isOnline = (hour >= 18 && hour < 23);
+                } else { // Weekend (Saturday and Sunday)
+                    isOnline = (hour >= 14 || hour < 1);
+                }
+                
+                // Update the badge appearance and text
+                if (isOnline) {
+                    statusBadge.className = 'status-badge online';
+                    statusText.textContent = 'Live Now';
+                } else {
+                    statusBadge.className = 'status-badge offline';
+                    statusText.textContent = 'Offline';
+                }
+            }
+            
+            // Initial status update
+            updateStatus();
+            
+            // Update status every minute to reflect changes
+            setInterval(updateStatus, 60000);
+            
+            // Simulate online status with a pulsing effect when online
             setInterval(() => {
-                onlineBadge.style.opacity = onlineBadge.style.opacity === '0.8' ? '1' : '0.8';
+                if (statusBadge.classList.contains('online')) {
+                    statusBadge.style.opacity = statusBadge.style.opacity === '0.8' ? '1' : '0.8';
+                } else {
+                    statusBadge.style.opacity = '1';
+                }
             }, 1000);
         });
     </script>
